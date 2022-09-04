@@ -1,0 +1,31 @@
+# This workflow test a Python project with pytest, build Docker image and send it to private Dockerhub
+name: Python application CI
+
+on:
+  push:
+    branches:
+    - my_own_pipeline
+  pull_request:
+  
+jobs:
+  build:
+
+    runs-on: ${{matrix.os}}
+    strategy:
+      matrix: 
+        os: [ubuntu-latest] 
+        
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: Test repository using makefile
+        run: make test
+
+      - name: Docker Build & Push Action
+        uses: mr-smithers-excellent/docker-build-push@v4
+        with:
+          image:  ${{ secrets.DOCKERHUB_USERNAME }}/github_actions_for_python_demoapp
+          registry: docker.io
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
